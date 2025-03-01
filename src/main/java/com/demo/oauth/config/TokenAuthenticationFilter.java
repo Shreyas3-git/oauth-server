@@ -1,7 +1,6 @@
 package com.demo.oauth.config;
 
 import com.demo.oauth.service.TokenService;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -17,14 +16,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
-import java.lang.management.GarbageCollectorMXBean;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Objects;
 
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE)
@@ -50,7 +45,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
             String authHeader = request.getHeader("Authorization");
 
             if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-                sendErrorResponse(request,response,HttpStatus.UNAUTHORIZED,"Missing bearer-token in Authorization header");
+                sendErrorResponse(request,response,HttpStatus.FORBIDDEN,"Missing bearer-token in Authorization header");
                 return;
             }
             String token = authHeader.substring(7);
@@ -68,9 +63,6 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
                 filterChain.doFilter(request,response);
             }
         }
-//        catch (ResponseStatusException ex) { // Catch the exception
-//            sendErrorResponse(request,response,HttpStatus.INTERNAL_SERVER_ERROR,ex.getMessage());
-//        }
         catch (Exception ex) {
             logger.info(String.format("Exception Message : %s",ex.getLocalizedMessage()));
             sendErrorResponse(request,response,HttpStatus.UNAUTHORIZED,ex.getMessage());
