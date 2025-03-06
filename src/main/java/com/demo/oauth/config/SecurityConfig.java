@@ -9,7 +9,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter;
 import org.springframework.security.web.authentication.preauth.RequestHeaderAuthenticationFilter;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -40,19 +39,23 @@ public class SecurityConfig {
     @Bean
     public AbstractPreAuthenticatedProcessingFilter bearerTokenFilter() {
         RequestHeaderAuthenticationFilter filter = new RequestHeaderAuthenticationFilter();
-        filter.setPrincipalRequestHeader("Authorization"); // Expect token in Authorization header
-        filter.setAuthenticationManager(authentication -> {
-            String token = (String) authentication.getPrincipal();
-            if (token != null && token.startsWith("Bearer ")) {
-                String actualToken = token.substring(7); // Extract token after "Bearer "
-                if (tokenService.isTokenValid(actualToken)) {
-                    // Create a user with a default role
-                    UserDetails user = new User("bearer-user", "", Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")));
-                    return new PreAuthenticatedAuthenticationToken(user, null, user.getAuthorities());
+        try {
+            filter.setPrincipalRequestHeader("Authorization"); // Expect token in Authorization header
+            filter.setAuthenticationManager(authentication -> {
+                String token = (String) authentication.getPrincipal();
+                if (token != null && token.startsWith("Bearer ")) {
+                    String actualToken = token.substring(7); // Extract token after "Bearer "
+                    if (tokenService.isTokenValid(actualToken)) {
+                        // Create a user with a default role
+                        UserDetails user = new User("bearer-user", "", Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")));
+                        return new PreAuthenticatedAuthenticationToken(user, null, user.getAuthorities());
+                    }
                 }
-            }
-            throw new UsernameNotFoundException("Invalid or missing bearer token");
-        });
+                throw new UsernameNotFoundException("Invalid or missing bearer token");
+            });
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
         return filter;
     }
 }

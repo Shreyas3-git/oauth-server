@@ -1,9 +1,11 @@
 server:
   port: 9091
 spring:
+  active:
+    profile: dev
   application:
     name: oauth-server
 security:
   jwt:
-    secret: RkL+xbQRNWuHdgfd8AZ0Urps8mR+894/aEqlzL/iI1LoPpbLSlhy9oNkDQgyIS0Rz9OQHAcUug6urdjePLWVOg==  # Replace with a strong, unique key
-    issuer: "http://localhost:9091/oauth/token"
+    secret: ${JWT_SECRET}  # Replace with a strong, unique key
+    issuer: ${OAUTH_ISSUER}

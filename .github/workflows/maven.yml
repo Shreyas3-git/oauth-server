@@ -29,6 +29,9 @@ jobs:
         cache: maven
     - name: Build with Maven
       run: mvn -B package --file pom.xml
+      env:
+        JWT_SECRET: ${{ secrets.JWT_SECRET }} # Retrieve JWT_SECRET from GitHub secrets
+        OAUTH_ISSUER: ${{ secrets.OAUTH_ISSUER }} # Retrieve OAUTH_ISSUER from GitHub secrets
 
     # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
     - name: Update dependency graph
