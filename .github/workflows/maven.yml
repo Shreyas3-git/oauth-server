@@ -14,6 +14,10 @@ on:
   pull_request:
     branches: [ "master" ]
 
+permissions:
+  dependency-submission: write # Grant permission to write to the dependency graph
+
+
 jobs:
   build:
 
